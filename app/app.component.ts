@@ -1,42 +1,24 @@
 import { Component } from '@angular/core';
 
-export class Hero{
-  id: Number;
-  name: string;
-}
+import {OnInit} from '@angular/core'
 
-const HEROES: Hero[] = [
-  { id: 11, name: 'Mr. Nice' },
-  { id: 12, name: 'Narco' },
-  { id: 13, name: 'Bombasto' },
-  { id: 14, name: 'Celeritas' },
-  { id: 15, name: 'Magneta' },
-  { id: 16, name: 'RubberMan' },
-  { id: 17, name: 'Dynama' },
-  { id: 18, name: 'Dr IQ' },
-  { id: 19, name: 'Magma' },
-  { id: 20, name: 'Tornado' }
-];
+import {Hero} from './hero';
+import{HeroService} from './hero.service'
 
 
 @Component({
   selector: 'my-app',
+  providers: [HeroService],
   template:` 
   <h1>{{title}}</h1>
-  <h2>My Heros</h2>
+  <h2>My heroes</h2>
   <ul class = "heroes">
     <li *ngFor="let h of heroes" (click)=onSelect(h) [class.selected]="h===selectedHero">
       <span class="badge">{{h.id}}</span> {{h.name}}
     </li>
   </ul>
-  <div *ngIf="selectedHero">
-    <h2>{{selectedHero.name}} details!</h2>
-    <div><label>id: </label>{{selectedHero.id}}</div>
-    <div>
-      <label>name: </label>
-      <input [(ngModel)] = "selectedHero.name" placeholder="name"></div>
-  </div>`,
-
+  <my-hero-detail [hero]="selectedHero"></my-hero-detail>
+  `,
     styles: [`
       .selected {
         background-color: #CFD8DC !important;
@@ -87,12 +69,24 @@ const HEROES: Hero[] = [
       }
 `] 
 })
-export class AppComponent  { name = 'Angular'; 
-title = 'Tour of Heros';
+export class AppComponent implements OnInit { 
+
+//The constructor itself does nothing. 
+//The parameter simultaneously defines a private heroService property and identifies it as a HeroService
+// injection site.
+constructor(private heroService: HeroService){}
+
+ngOnInit() : void{ this.getHeroes();}
+name = 'Angular'; 
+title = 'Tour of heroes';
 selectedHero : Hero = undefined;
-heroes= HEROES;
+heroes: Hero[];
+
+  getHeroes(): void {
+    this.heroService.getHeroes().then(pHeroes => this.heroes = pHeroes) //Promise Heroes added to the arrary.
+  }
 //This is a comment.
-onSelect(h : Hero)
+onSelect(h : Hero): void
 {
   this.selectedHero = h;
 }
